@@ -1,0 +1,11 @@
+[package]
+name = "inform"
+description = "Another rust indentation formatter"
+version = "0.1.0"
+edition = "2021"
+authors = ["Ethan Uppal"]
+repository = "https://github.com/ethanuppal/inform"
+license = "MIT"
+license-file = "LICENSE"
+
+[dependencies]
