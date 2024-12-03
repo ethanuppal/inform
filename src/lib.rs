@@ -1,5 +1,10 @@
+#[cfg(feature = "fmt")]
 pub mod fmt;
 
+#[cfg(feature = "io")]
+pub mod io;
+
+#[cfg(feature = "fmt")]
 #[cfg(test)]
 mod tests {
     use std::fmt::{self, Display, Write};
@@ -8,7 +13,7 @@ mod tests {
 
     struct TestIndentFormatter;
     impl Display for TestIndentFormatter {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
             let mut f = IndentFormatter::new(f, 2);
             writeln!(f, "hello\ngoodbye")?;
             f.increase_indent();
