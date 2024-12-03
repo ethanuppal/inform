@@ -10,7 +10,7 @@ pub struct IndentFormatter<'buffer> {
 
 impl<'buffer> IndentFormatter<'buffer> {
     /// Constructs a new formatter managing indents of `indent` spaces in the
-    /// wrapped formatter `formatter`.
+    /// wrapped IO buffer `buffer`.
     pub fn new(buffer: &'buffer mut dyn io::Write, indent: usize) -> Self {
         Self {
             current_indent: String::new(),
@@ -43,6 +43,64 @@ impl<'buffer> IndentFormatter<'buffer> {
 }
 
 impl io::Write for IndentFormatter<'_> {
+    fn write(&mut self, str: &[u8]) -> io::Result<usize> {
+        for c in str::from_utf8(str).map_err(io::Error::other)?.chars() {
+            if self.last_was_newline {
+                self.buffer.write_all(self.current_indent.as_bytes())?;
+            }
+            self.buffer.write_all(c.to_string().as_bytes())?;
+            self.last_was_newline = c == '\n';
+        }
+        Ok(str.len())
+    }
+
+    fn flush(&mut self) -> io::Result<()> {
+        self.buffer.flush()
+    }
+}
+
+pub struct GenericIndentFormatter<'buffer, W: io::Write> {
+    current_indent: String,
+    add_indent: usize,
+    last_was_newline: bool,
+    buffer: &'buffer mut W,
+}
+
+impl<'buffer, W: io::Write> GenericIndentFormatter<'buffer, W> {
+    /// Constructs a new formatter managing indents of `indent` spaces in the
+    /// wrapped IO buffer `buffer`.
+    pub fn new(buffer: &'buffer mut W, indent: usize) -> Self {
+        Self {
+            current_indent: String::new(),
+            add_indent: indent,
+            last_was_newline: false,
+            buffer,
+        }
+    }
+
+    /// Adds a level of indentation.
+    pub fn increase_indent(&mut self) {
+        for _ in 0..self.add_indent {
+            self.current_indent.push(' ');
+        }
+    }
+
+    /// Removes a level of indentation.
+    pub fn decrease_indent(&mut self) {
+        for _ in 0..self.add_indent {
+            self.current_indent.pop();
+        }
+    }
+
+    pub fn with_raw_buffer<'this: 'buffer, R, F: FnOnce(&'buffer mut W) -> R>(
+        &'this mut self,
+        f: F,
+    ) -> R {
+        f(self.buffer)
+    }
+}
+
+impl<W: io::Write> io::Write for GenericIndentFormatter<'_, W> {
     fn write(&mut self, str: &[u8]) -> io::Result<usize> {
         for c in str::from_utf8(str).map_err(io::Error::other)?.chars() {
             if self.last_was_newline {
