@@ -33,6 +33,13 @@ impl<'buffer> IndentFormatter<'buffer> {
             self.current_indent.pop();
         }
     }
+
+    pub fn with_raw_buffer<'this: 'buffer, R, F: FnOnce(&'buffer mut dyn io::Write) -> R>(
+        &'this mut self,
+        f: F,
+    ) -> R {
+        f(self.buffer)
+    }
 }
 
 impl io::Write for IndentFormatter<'_> {
