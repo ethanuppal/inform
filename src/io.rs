@@ -92,10 +92,7 @@ impl<'buffer, W: io::Write> GenericIndentFormatter<'buffer, W> {
         }
     }
 
-    pub fn with_raw_buffer<'this: 'buffer, R, F: FnOnce(&'buffer mut W) -> R>(
-        &'this mut self,
-        f: F,
-    ) -> R {
+    pub fn with_raw_buffer<R, F: FnOnce(&mut W) -> R>(&mut self, f: F) -> R {
         f(self.buffer)
     }
 }
