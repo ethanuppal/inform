@@ -1,6 +1,12 @@
-# inform: INdent FORMatting
+<div align="center">
+ <img src="./assets/inform-logo.svg" width="250px">
+ <p><strong>indent formatting everywhere</strong></p>
+</div>
 
 ![CI Badge](https://github.com/ethanuppal/inform/actions/workflows/ci.yaml/badge.svg)
+![Crates.io Version](https://img.shields.io/crates/v/inform)
+![docs.rs](https://img.shields.io/docsrs/inform)
+![Crates.io License](https://img.shields.io/crates/l/inform)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg)](https://github.com/rust-secure-code/safety-dance/)
 
 `inform` gives you
