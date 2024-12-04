@@ -1,6 +1,6 @@
 <div align="center">
  <img src="./assets/inform-logo.svg" width="250px">
- <p><strong>indent formatting everywhere</strong></p>
+ <p><strong>indent formatting, everywhere</strong></p>
 </div>
 
 ![CI Badge](https://github.com/ethanuppal/inform/actions/workflows/ci.yaml/badge.svg)
@@ -87,6 +87,7 @@ fn test_indent_writer() {
 
 - [`calyx-writer`](https://github.com/calyxir/calyx/tree/main/tools/calyx-writer)
 - [`spadefmt`](https://github.com/ethanuppal/spadefmt)
+- [`pulsar`](https://github.com/ethanuppal/pulsar/tree/main)
 
 <a name="alternatives"></a>
 
