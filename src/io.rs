@@ -1,115 +1,75 @@
+// Copyright (C) 2024 Ethan Uppal. All rights reserved.
+//
+// This file is part of inform. inform is free software: you can redistribute it
+// and/or modify it under the terms of the GNU Lesser General Public License as
+// published by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version. inform is distributed in the hope that
+// it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details. You should have received a
+// copy of the GNU Lesser General Public License along with inform. If not, see
+// <https://www.gnu.org/licenses/>.
+
 use core::str;
 use std::io;
 
-pub struct IndentFormatter<'buffer> {
-    current_indent: String,
-    add_indent: usize,
-    last_was_newline: bool,
-    buffer: &'buffer mut dyn io::Write,
+use crate::{
+    common::{IndentWrite, IndentWriterCommon, IndentWriterImpl},
+    marker,
+};
+
+impl<W: io::Write> IndentWrite<marker::IO> for W {
+    type Error = io::Error;
+
+    fn write_char(&mut self, c: char) -> Result<(), Self::Error> {
+        self.write_all(c.to_string().as_bytes())
+    }
+
+    fn write_str(&mut self, str: &str) -> Result<(), Self::Error> {
+        self.write_all(str.as_bytes())
+    }
+
+    fn flush(&mut self) -> Result<(), Self::Error> {
+        self.flush()
+    }
 }
 
-impl<'buffer> IndentFormatter<'buffer> {
+pub struct IndentWriter<'buffer, W: io::Write> {
+    inner: IndentWriterImpl<'buffer, marker::IO, W>,
+}
+
+impl<'buffer, W: io::Write> IndentWriter<'buffer, W> {
     /// Constructs a new formatter managing indents of `indent` spaces in the
     /// wrapped IO buffer `buffer`.
-    pub fn new(buffer: &'buffer mut dyn io::Write, indent: usize) -> Self {
+    pub fn new(w: &'buffer mut W, indent: usize) -> Self {
         Self {
-            current_indent: String::new(),
-            add_indent: indent,
-            last_was_newline: false,
-            buffer,
-        }
-    }
-
-    /// Adds a level of indentation.
-    pub fn increase_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.push(' ');
-        }
-    }
-
-    /// Removes a level of indentation.
-    pub fn decrease_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.pop();
-        }
-    }
-
-    pub fn with_raw_buffer<'this: 'buffer, R, F: FnOnce(&'buffer mut dyn io::Write) -> R>(
-        &'this mut self,
-        f: F,
-    ) -> R {
-        f(self.buffer)
-    }
-}
-
-impl io::Write for IndentFormatter<'_> {
-    fn write(&mut self, str: &[u8]) -> io::Result<usize> {
-        for c in str::from_utf8(str).map_err(io::Error::other)?.chars() {
-            if self.last_was_newline {
-                self.buffer.write_all(self.current_indent.as_bytes())?;
-            }
-            self.buffer.write_all(c.to_string().as_bytes())?;
-            self.last_was_newline = c == '\n';
-        }
-        Ok(str.len())
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        self.buffer.flush()
-    }
-}
-
-pub struct GenericIndentFormatter<'buffer, W: io::Write> {
-    current_indent: String,
-    add_indent: usize,
-    last_was_newline: bool,
-    buffer: &'buffer mut W,
-}
-
-impl<'buffer, W: io::Write> GenericIndentFormatter<'buffer, W> {
-    /// Constructs a new formatter managing indents of `indent` spaces in the
-    /// wrapped IO buffer `buffer`.
-    pub fn new(buffer: &'buffer mut W, indent: usize) -> Self {
-        Self {
-            current_indent: String::new(),
-            add_indent: indent,
-            last_was_newline: false,
-            buffer,
-        }
-    }
-
-    /// Adds a level of indentation.
-    pub fn increase_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.push(' ');
-        }
-    }
-
-    /// Removes a level of indentation.
-    pub fn decrease_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.pop();
+            inner: IndentWriterImpl::new(w, indent),
         }
     }
 
     pub fn with_raw_buffer<R, F: FnOnce(&mut W) -> R>(&mut self, f: F) -> R {
-        f(self.buffer)
+        f(self.inner.wrapped)
     }
 }
 
-impl<W: io::Write> io::Write for GenericIndentFormatter<'_, W> {
+impl<W: io::Write> IndentWriterCommon for IndentWriter<'_, W> {
+    fn increase_indent(&mut self) {
+        self.inner.increase_indent();
+    }
+
+    fn decrease_indent(&mut self) {
+        self.inner.decrease_indent();
+    }
+}
+
+impl<W: io::Write> io::Write for IndentWriter<'_, W> {
     fn write(&mut self, str: &[u8]) -> io::Result<usize> {
-        for c in str::from_utf8(str).map_err(io::Error::other)?.chars() {
-            if self.last_was_newline {
-                self.buffer.write_all(self.current_indent.as_bytes())?;
-            }
-            self.buffer.write_all(c.to_string().as_bytes())?;
-            self.last_was_newline = c == '\n';
-        }
+        self.inner
+            .write_str(str::from_utf8(str).map_err(io::Error::other)?)?;
         Ok(str.len())
     }
 
     fn flush(&mut self) -> io::Result<()> {
-        self.buffer.flush()
+        self.inner.flush()
     }
 }

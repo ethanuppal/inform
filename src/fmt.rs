@@ -1,48 +1,68 @@
+// Copyright (C) 2024 Ethan Uppal. All rights reserved.
+//
+// This file is part of inform. inform is free software: you can redistribute it
+// and/or modify it under the terms of the GNU Lesser General Public License as
+// published by the Free Software Foundation, either version 3 of the License,
+// or (at your option) any later version. inform is distributed in the hope that
+// it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+// warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+// Lesser General Public License for more details. You should have received a
+// copy of the GNU Lesser General Public License along with inform. If not, see
+// <https://www.gnu.org/licenses/>.
+
 use core::fmt;
 
-pub struct IndentFormatter<'a, 'b: 'a> {
-    current_indent: String,
-    add_indent: usize,
-    last_was_newline: bool,
-    formatter: &'a mut fmt::Formatter<'b>,
-}
+use crate::{
+    common::{IndentWrite, IndentWriterCommon, IndentWriterImpl},
+    marker::{self},
+};
 
-impl<'a, 'b: 'a> IndentFormatter<'a, 'b> {
-    /// Constructs a new formatter managing indents of `indent` spaces in the
-    /// wrapped formatter `formatter`.
-    pub fn new(formatter: &'a mut fmt::Formatter<'b>, indent: usize) -> Self {
-        Self {
-            current_indent: String::new(),
-            add_indent: indent,
-            last_was_newline: false,
-            formatter,
-        }
+impl<W: fmt::Write> IndentWrite<marker::Format> for W {
+    type Error = fmt::Error;
+
+    #[inline]
+    fn write_char(&mut self, c: char) -> Result<(), Self::Error> {
+        self.write_char(c)
     }
 
-    /// Adds a level of indentation.
-    pub fn increase_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.push(' ');
-        }
+    #[inline]
+    fn write_str(&mut self, str: &str) -> Result<(), Self::Error> {
+        self.write_str(str)
     }
 
-    /// Removes a level of indentation.
-    pub fn decrease_indent(&mut self) {
-        for _ in 0..self.add_indent {
-            self.current_indent.pop();
-        }
-    }
-}
-
-impl fmt::Write for IndentFormatter<'_, '_> {
-    fn write_str(&mut self, s: &str) -> fmt::Result {
-        for c in s.chars() {
-            if self.last_was_newline {
-                self.formatter.write_str(&self.current_indent)?;
-            }
-            self.formatter.write_char(c)?;
-            self.last_was_newline = c == '\n';
-        }
+    #[inline]
+    fn flush(&mut self) -> Result<(), Self::Error> {
         Ok(())
     }
 }
+
+pub struct IndentWriter<'fmt, W: fmt::Write> {
+    inner: IndentWriterImpl<'fmt, marker::Format, W>,
+}
+
+impl<'fmt, W: fmt::Write> IndentWriter<'fmt, W> {
+    pub fn new(w: &'fmt mut W, indent: usize) -> Self {
+        Self {
+            inner: IndentWriterImpl::new(w, indent),
+        }
+    }
+}
+
+impl<W: fmt::Write> IndentWriterCommon for IndentWriter<'_, W> {
+    fn increase_indent(&mut self) {
+        self.inner.increase_indent();
+    }
+
+    fn decrease_indent(&mut self) {
+        self.inner.decrease_indent();
+    }
+}
+
+impl<W: fmt::Write> fmt::Write for IndentWriter<'_, W> {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.inner.write_str(s)
+    }
+}
+
+pub type IndentFormatter<'fmt, 'buffer> =
+    IndentWriter<'fmt, fmt::Formatter<'buffer>>;
