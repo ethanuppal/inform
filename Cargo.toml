@@ -1,7 +1,7 @@
 [package]
 name = "inform"
-description = "Another rust indentation formatter"
-version = "0.3.1"
+description = "Another Rust indentation formatter"
+version = "0.3.2"
 edition = "2021"
 authors = ["Ethan Uppal"]
 repository = "https://github.com/ethanuppal/inform"
@@ -12,4 +12,5 @@ default = ["fmt", "io"]
 fmt = []
 io = []
 
-[dependencies]
+[build-dependencies]
+cargo_toml = "0.20.5"

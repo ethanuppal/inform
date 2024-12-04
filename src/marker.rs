@@ -16,7 +16,7 @@
 /// A marker for a stream supporting indent formatting.
 pub trait IndentWriteMarker {}
 
-/// Marks an IO stream.
+/// Marks an I/O buffer.
 #[cfg(feature = "io")]
 pub struct IO;
 
