@@ -10,6 +10,9 @@
 // copy of the GNU Lesser General Public License along with inform. If not, see
 // <https://www.gnu.org/licenses/>.
 
+//! Utility module for enabling an implementation-independent indent writer
+//! backend.
+
 /// A marker for a stream supporting indent formatting.
 pub trait IndentWriteMarker {}
 

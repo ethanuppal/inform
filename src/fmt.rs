@@ -10,6 +10,8 @@
 // copy of the GNU Lesser General Public License along with inform. If not, see
 // <https://www.gnu.org/licenses/>.
 
+//! Indent formatting in format streams.
+
 use core::fmt;
 
 use crate::{
@@ -36,11 +38,14 @@ impl<W: fmt::Write> IndentWrite<marker::Format> for W {
     }
 }
 
+/// Format-level indent writer.
 pub struct IndentWriter<'fmt, W: fmt::Write> {
     inner: IndentWriterImpl<'fmt, marker::Format, W>,
 }
 
 impl<'fmt, W: fmt::Write> IndentWriter<'fmt, W> {
+    /// Constructs a new indet writer managing indents of `indent` spaces in the
+    /// wrapped format stream `w`.
     pub fn new(w: &'fmt mut W, indent: usize) -> Self {
         Self {
             inner: IndentWriterImpl::new(w, indent),
