@@ -44,8 +44,8 @@ pub struct IndentWriter<'fmt, W: fmt::Write> {
 }
 
 impl<'fmt, W: fmt::Write> IndentWriter<'fmt, W> {
-    /// Constructs a new indet writer managing indents of `indent` spaces in the
-    /// wrapped format stream `w`.
+    /// Constructs a new indent writer managing indents of `indent` spaces in
+    /// the wrapped format stream `w`.
     pub fn new(w: &'fmt mut W, indent: usize) -> Self {
         Self {
             inner: IndentWriterImpl::new(w, indent),

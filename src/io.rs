@@ -42,8 +42,8 @@ pub struct IndentWriter<'buffer, W: io::Write> {
 }
 
 impl<'buffer, W: io::Write> IndentWriter<'buffer, W> {
-    /// Constructs a new indet writer managing indents of `indent` spaces in the
-    /// wrapped IO buffer `w`.
+    /// Constructs a new indent writer managing indents of `indent` spaces in
+    /// the wrapped IO buffer `w`.
     pub fn new(w: &'buffer mut W, indent: usize) -> Self {
         Self {
             inner: IndentWriterImpl::new(w, indent),
