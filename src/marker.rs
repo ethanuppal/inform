@@ -10,13 +10,19 @@
 // copy of the GNU Lesser General Public License along with inform. If not, see
 // <https://www.gnu.org/licenses/>.
 
-#![forbid(unsafe_code)]
+/// A marker for a stream supporting indent formatting.
+pub trait IndentWriteMarker {}
 
-pub mod common;
-pub mod marker;
-
-#[cfg(feature = "fmt")]
-pub mod fmt;
+/// Marks an IO stream.
+#[cfg(feature = "io")]
+pub struct IO;
 
 #[cfg(feature = "io")]
-pub mod io;
+impl IndentWriteMarker for IO {}
+
+/// Marks a format stream.
+#[cfg(feature = "fmt")]
+pub struct Format;
+
+#[cfg(feature = "fmt")]
+impl IndentWriteMarker for Format {}
