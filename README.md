@@ -11,10 +11,12 @@
 
 `inform` gives you
 
-- A `std::fmt::Formatter` drop-in replacement designed for formatting structured data such as AST nodes.
-- More generally, an API for formatting any type implementing `std::io::Write` or `std::fmt::Write` with indentation.
+- A `std::fmt::Formatter` drop-in replacement designed for formatting
+  structured data such as AST nodes.
+- More generally, an API for formatting any type implementing
+  `std::io::Write` or `std::fmt::Write` with indentation.
 
-The format and IO implementations are behind [Cargo features](https://doc.rust-lang.org/cargo/reference/features.html) `"fmt"` and `"io"` respectively, both of which are enabled by default.
+The format and I/O implementations are behind [Cargo features](https://doc.rust-lang.org/cargo/reference/features.html) `"fmt"` and `"io"` respectively, both of which are enabled by default.
 
 ## Contents
 
