@@ -28,7 +28,7 @@ impl<W: io::Write> IndentWrite<marker::IO> for W {
     }
 
     fn write_str(&mut self, str: &str) -> Result<(), Self::Error> {
-        <Self as io::Write>::write(self, str.as_bytes()).and(Ok(()))
+        <Self as io::Write>::write_all(self, str.as_bytes())
     }
 
     fn flush(&mut self) -> Result<(), Self::Error> {
@@ -63,6 +63,10 @@ impl<W: io::Write> IndentWriterCommon for IndentWriter<'_, W> {
 
     fn decrease_indent(&mut self) {
         self.inner.decrease_indent();
+    }
+
+    fn indent_if_needed(&mut self) {
+        let _ = self.inner.indent_if_needed();
     }
 }
 

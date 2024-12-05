@@ -61,6 +61,10 @@ impl<W: fmt::Write> IndentWriterCommon for IndentWriter<'_, W> {
     fn decrease_indent(&mut self) {
         self.inner.decrease_indent();
     }
+
+    fn indent_if_needed(&mut self) {
+        let _ = self.inner.indent_if_needed();
+    }
 }
 
 impl<W: fmt::Write> fmt::Write for IndentWriter<'_, W> {

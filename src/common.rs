@@ -68,6 +68,17 @@ impl<'w, M: IndentWriteMarker, W: IndentWrite<M>> IndentWriterImpl<'w, M, W> {
         let new_length = self.current_indent.len() - self.indent_delta;
         self.current_indent.truncate(new_length);
     }
+
+    #[inline]
+    pub(crate) fn indent_if_needed(
+        &mut self,
+    ) -> Result<(), <Self as IndentWrite<M>>::Error> {
+        if self.last_was_newline {
+            self.wrapped.write_str(&self.current_indent)?;
+            self.last_was_newline = false;
+        }
+        Ok(())
+    }
 }
 
 impl<M: IndentWriteMarker, W: IndentWrite<M>> IndentWrite<M>
@@ -77,9 +88,7 @@ impl<M: IndentWriteMarker, W: IndentWrite<M>> IndentWrite<M>
 
     #[inline]
     fn write_char(&mut self, c: char) -> Result<(), Self::Error> {
-        if self.last_was_newline {
-            self.wrapped.write_str(&self.current_indent)?;
-        }
+        self.indent_if_needed()?;
         self.wrapped.write_char(c)?;
         self.last_was_newline = c == '\n';
         Ok(())
@@ -108,4 +117,7 @@ pub trait IndentWriterCommon {
     /// Removes a level of indentation. The new indent takes effect upon the
     /// next newline.
     fn decrease_indent(&mut self);
+
+    /// You will usually not need to call this function manually.
+    fn indent_if_needed(&mut self);
 }
