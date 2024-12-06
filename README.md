@@ -33,7 +33,7 @@ Here's how you can use `fmt::IndentFormatter`:
 
 ```rs
 use std::fmt::{self, Write};
-use inform::common::IndentWriterCommon, fmt::IndentFormatter;
+use inform::{common::IndentWriterCommon, fmt::IndentFormatter};
 
 struct TestIndentFormatter;
 
@@ -61,7 +61,7 @@ Here's how you can use `fmt::IndentWriter`:
 
 ```rs
 use std::fmt::{self, Write};
-use inform::common::IndentWriterCommon, fmt::IndentWriter;
+use inform::{common::IndentWriterCommon, fmt::IndentFormatter};
 
 fn write_text(str: &mut String) -> fmt::Result {
     let mut f = IndentWriter::new(str, 2);
@@ -107,3 +107,4 @@ The following crates are alternatives that I found did not fit my use case.
 ## License
 
 A copy of the LGPL License is provided in the [LICENSE](LICENSE) file.
+
