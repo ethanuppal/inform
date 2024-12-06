@@ -24,12 +24,12 @@ impl<W: fmt::Write> IndentWrite<marker::Format> for W {
 
     #[inline]
     fn write_char(&mut self, c: char) -> Result<(), Self::Error> {
-        self.write_char(c)
+        <Self as fmt::Write>::write_char(self, c)
     }
 
     #[inline]
     fn write_str(&mut self, str: &str) -> Result<(), Self::Error> {
-        self.write_str(str)
+        <Self as fmt::Write>::write_str(self, str)
     }
 
     #[inline]

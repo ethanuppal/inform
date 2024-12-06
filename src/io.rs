@@ -32,7 +32,7 @@ impl<W: io::Write> IndentWrite<marker::IO> for W {
     }
 
     fn flush(&mut self) -> Result<(), Self::Error> {
-        self.flush()
+        <Self as io::Write>::flush(self)
     }
 }
 
